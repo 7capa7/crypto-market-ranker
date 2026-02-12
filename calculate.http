@@ -1,0 +1,5 @@
+### Calculate spread ranking
+POST http://localhost:8080/api/spread/calculate
+Authorization: Bearer ABC123
+
+###

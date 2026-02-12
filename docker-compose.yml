@@ -1,0 +1,12 @@
+services:
+  crypto-market-ranker:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      SECURITY_BEARER_TOKEN: "ABC123"
+      KANGA_BASE_URL: "https://public.kanga.exchange"
+      KANGA_CONNECT_TIMEOUT: "2s"
+      KANGA_READ_TIMEOUT: "4s"
+      KANGA_CONCURRENCY_LIMIT: 300
+    restart: unless-stopped
