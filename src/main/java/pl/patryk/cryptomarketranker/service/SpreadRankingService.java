@@ -10,6 +10,7 @@ import pl.patryk.cryptomarketranker.utils.RankingResponseDto;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -39,7 +40,7 @@ public class SpreadRankingService {
     }
 
     public RankingResponseDto calculateAndStore() {
-        Instant now = Instant.now();
+        Instant now = Instant.now().truncatedTo(ChronoUnit.SECONDS);
 
         List<String> markets = marketDataProvider.getAvailableMarkets();
         if (markets.isEmpty()) {
