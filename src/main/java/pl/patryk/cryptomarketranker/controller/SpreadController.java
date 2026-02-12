@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pl.patryk.cryptomarketranker.service.SpreadRankingService;
+import pl.patryk.cryptomarketranker.utils.RankingDto;
 import pl.patryk.cryptomarketranker.utils.RankingResponseDto;
 
 import java.time.Instant;
@@ -25,8 +26,8 @@ public class SpreadController {
 
     @PostMapping(value = "/calculate", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<RankingResponseDto> calculate() {
-        RankingResponseDto rankingResponseDto = spreadRankingService.calculateAndStore();
-        return ResponseEntity.ok(rankingResponseDto);
+        RankingDto rankingDto = spreadRankingService.calculateAndStore();
+        return ResponseEntity.ok(new RankingResponseDto(nowUtc(), rankingDto));
     }
 
     @GetMapping(value = "/ranking", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -34,11 +35,14 @@ public class SpreadController {
         return spreadRankingService.getLastRanking()
                 .map(item -> ResponseEntity.ok(
                         new RankingResponseDto(
-                                Instant.now().truncatedTo(ChronoUnit.SECONDS),
-                                item.ranking()
+                                nowUtc(),
+                                item
                         )
                 ))
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
+    private static Instant nowUtc() {
+        return Instant.now().truncatedTo(ChronoUnit.SECONDS);
+    }
 }

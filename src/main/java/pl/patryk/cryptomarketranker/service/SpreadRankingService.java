@@ -6,11 +6,8 @@ import pl.patryk.cryptomarketranker.storage.RankingStorage;
 import pl.patryk.cryptomarketranker.utils.MarketSpreadDto;
 import pl.patryk.cryptomarketranker.utils.OrderBook;
 import pl.patryk.cryptomarketranker.utils.RankingDto;
-import pl.patryk.cryptomarketranker.utils.RankingResponseDto;
 
 import java.math.BigDecimal;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -35,17 +32,16 @@ public class SpreadRankingService {
         this.limiter = limiter;
     }
 
-    public Optional<RankingResponseDto> getLastRanking() {
+    public Optional<RankingDto> getLastRanking() {
         return rankingStorage.get();
     }
 
-    public RankingResponseDto calculateAndStore() {
-        Instant now = Instant.now().truncatedTo(ChronoUnit.SECONDS);
+    public RankingDto calculateAndStore() {
 
         List<String> markets = marketDataProvider.getAvailableMarkets();
         if (markets.isEmpty()) {
 
-            RankingResponseDto empty = new RankingResponseDto(now, new RankingDto(List.of(), List.of(), List.of()));
+            RankingDto empty = new RankingDto(List.of(), List.of(), List.of());
             rankingStorage.save(empty);
             return empty;
         }
@@ -82,17 +78,15 @@ public class SpreadRankingService {
         group2.sort(byMarket);
         group3.sort(byMarket);
 
-        RankingResponseDto snapshot = new RankingResponseDto(
-                now,
+        RankingDto rankingDto =
                 new RankingDto(
                         List.copyOf(group1),
                         List.copyOf(group2),
                         List.copyOf(group3)
-                )
-        );
+                );
 
-        rankingStorage.save(snapshot);
-        return snapshot;
+        rankingStorage.save(rankingDto);
+        return rankingDto;
     }
 
     private record MarketResult(String market, BigDecimal spreadPercent) {

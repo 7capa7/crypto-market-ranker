@@ -10,6 +10,7 @@ import pl.patryk.cryptomarketranker.market.MarketDataProvider;
 import pl.patryk.cryptomarketranker.storage.RankingStorage;
 import pl.patryk.cryptomarketranker.utils.MarketSpreadDto;
 import pl.patryk.cryptomarketranker.utils.OrderBook;
+import pl.patryk.cryptomarketranker.utils.RankingDto;
 import pl.patryk.cryptomarketranker.utils.RankingResponseDto;
 
 import java.math.BigDecimal;
@@ -49,16 +50,15 @@ class SpreadRankingServiceTest {
                 rankingStorage, marketDataProvider, executor, limiter
         );
 
-        RankingResponseDto result = service.calculateAndStore();
+        RankingDto result = service.calculateAndStore();
 
         assertNotNull(result);
-        assertNotNull(result.timestamp());
-        assertNotNull(result.ranking());
-        assertTrue(result.ranking().group1().isEmpty());
-        assertTrue(result.ranking().group2().isEmpty());
-        assertTrue(result.ranking().group3().isEmpty());
+        assertNotNull(result);
+        assertTrue(result.group1().isEmpty());
+        assertTrue(result.group2().isEmpty());
+        assertTrue(result.group3().isEmpty());
 
-        verify(rankingStorage).save(any(RankingResponseDto.class));
+        verify(rankingStorage).save(any(RankingDto.class));
         verify(marketDataProvider).getAvailableMarkets();
         verifyNoMoreInteractions(marketDataProvider);
     }
@@ -83,27 +83,27 @@ class SpreadRankingServiceTest {
                 rankingStorage, marketDataProvider, executor, limiter
         );
 
-        RankingResponseDto result = service.calculateAndStore();
+        RankingDto result = service.calculateAndStore();
 
-        assertEquals(1, result.ranking().group1().size());
-        assertEquals(1, result.ranking().group2().size());
-        assertEquals(1, result.ranking().group3().size());
+        assertEquals(1, result.group1().size());
+        assertEquals(1, result.group2().size());
+        assertEquals(1, result.group3().size());
 
-        MarketSpreadDto g1 = result.ranking().group1().getFirst();
+        MarketSpreadDto g1 = result.group1().getFirst();
         assertEquals("A_MARKET", g1.market());
         assertEquals("2.00", g1.spread());
 
-        MarketSpreadDto g2 = result.ranking().group2().getFirst();
+        MarketSpreadDto g2 = result.group2().getFirst();
         assertEquals("B_MARKET", g2.market());
         assertEquals("7.64", g2.spread());
 
-        MarketSpreadDto g3 = result.ranking().group3().getFirst();
+        MarketSpreadDto g3 = result.group3().getFirst();
         assertEquals("Z_MARKET", g3.market());
         assertEquals("N/A", g3.spread());
 
-        ArgumentCaptor<RankingResponseDto> captor = ArgumentCaptor.forClass(RankingResponseDto.class);
+        ArgumentCaptor<RankingDto> captor = ArgumentCaptor.forClass(RankingDto.class);
         verify(rankingStorage).save(captor.capture());
-        RankingResponseDto saved = captor.getValue();
+        RankingDto saved = captor.getValue();
         assertEquals(result, saved);
 
         verify(marketDataProvider).getAvailableMarkets();
@@ -130,13 +130,13 @@ class SpreadRankingServiceTest {
                 rankingStorage, marketDataProvider, executor, limiter
         );
 
-        RankingResponseDto result = service.calculateAndStore();
+        RankingDto result = service.calculateAndStore();
 
-        assertEquals(3, result.ranking().group1().size());
-        assertTrue(result.ranking().group2().isEmpty());
-        assertTrue(result.ranking().group3().isEmpty());
+        assertEquals(3, result.group1().size());
+        assertTrue(result.group2().isEmpty());
+        assertTrue(result.group3().isEmpty());
 
-        List<String> sortedMarkets = result.ranking().group1().stream()
+        List<String> sortedMarkets = result.group1().stream()
                 .map(MarketSpreadDto::market)
                 .toList();
 
@@ -156,15 +156,15 @@ class SpreadRankingServiceTest {
                 rankingStorage, marketDataProvider, executor, limiter
         );
 
-        RankingResponseDto result = service.calculateAndStore();
+        RankingDto result = service.calculateAndStore();
 
-        assertTrue(result.ranking().group1().isEmpty());
-        assertTrue(result.ranking().group2().isEmpty());
-        assertEquals(1, result.ranking().group3().size());
-        assertEquals("BTC_USD", result.ranking().group3().getFirst().market());
-        assertEquals("N/A", result.ranking().group3().getFirst().spread());
+        assertTrue(result.group1().isEmpty());
+        assertTrue(result.group2().isEmpty());
+        assertEquals(1, result.group3().size());
+        assertEquals("BTC_USD", result.group3().getFirst().market());
+        assertEquals("N/A", result.group3().getFirst().spread());
 
-        verify(rankingStorage).save(any(RankingResponseDto.class));
+        verify(rankingStorage).save(any(RankingDto.class));
     }
 
 }

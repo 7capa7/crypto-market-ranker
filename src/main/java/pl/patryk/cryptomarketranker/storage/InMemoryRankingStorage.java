@@ -1,7 +1,7 @@
 package pl.patryk.cryptomarketranker.storage;
 
 import org.springframework.stereotype.Component;
-import pl.patryk.cryptomarketranker.utils.RankingResponseDto;
+import pl.patryk.cryptomarketranker.utils.RankingDto;
 
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
@@ -9,15 +9,15 @@ import java.util.concurrent.atomic.AtomicReference;
 @Component
 public class InMemoryRankingStorage implements RankingStorage {
 
-    private final AtomicReference<RankingResponseDto> reference = new AtomicReference<>();
+    private final AtomicReference<RankingDto> reference = new AtomicReference<>();
 
     @Override
-    public void save(RankingResponseDto rankingResponseDto) {
-        reference.set(rankingResponseDto);
+    public void save(RankingDto rankingDto) {
+        reference.set(rankingDto);
     }
 
     @Override
-    public Optional<RankingResponseDto> get() {
+    public Optional<RankingDto> get() {
         return Optional.ofNullable(reference.get());
     }
 }

@@ -1,11 +1,11 @@
 package pl.patryk.cryptomarketranker.storage;
 
-import pl.patryk.cryptomarketranker.utils.RankingResponseDto;
+import pl.patryk.cryptomarketranker.utils.RankingDto;
 
 import java.util.Optional;
 
 public interface RankingStorage {
-    void save(RankingResponseDto rankingResponseDto);
+    void save(RankingDto rankingDto);
 
-    Optional<RankingResponseDto> get();
+    Optional<RankingDto> get();
 }
