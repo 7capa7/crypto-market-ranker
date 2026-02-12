@@ -9,6 +9,9 @@ import org.springframework.web.bind.annotation.RestController;
 import pl.patryk.cryptomarketranker.service.SpreadRankingService;
 import pl.patryk.cryptomarketranker.utils.RankingResponseDto;
 
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+
 @RestController
 @RequestMapping("/spread")
 public class SpreadController {
@@ -29,7 +32,13 @@ public class SpreadController {
     @GetMapping(value = "/ranking", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<RankingResponseDto> ranking() {
         return spreadRankingService.getLastRanking()
-                .map(ResponseEntity::ok)
+                .map(item -> ResponseEntity.ok(
+                        new RankingResponseDto(
+                                Instant.now().truncatedTo(ChronoUnit.SECONDS),
+                                item.ranking()
+                        )
+                ))
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
+
 }
